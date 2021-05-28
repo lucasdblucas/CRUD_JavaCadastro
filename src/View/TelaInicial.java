@@ -23,6 +23,7 @@ import javax.swing.SwingConstants;
 import javax.swing.JButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.LayoutStyle.ComponentPlacement;
 
 public class TelaInicial extends JFrame {
 	
@@ -33,7 +34,8 @@ public class TelaInicial extends JFrame {
 	private JTextField textField_CPF;
 	private JTable table_listagem;
 	private JButton btnCadastrar;
-	JButton btnDeletar;
+	private JButton btnDeletar;
+	private JButton btn_buscar;
 	
 	// Variaveis de dados
 	private Usuario objUsuario;
@@ -60,11 +62,12 @@ public class TelaInicial extends JFrame {
 	public void carregarTable(Usuario objUsuario) {
 
         objDAO = new UsuarioDAO();
-        objUsuario = new Usuario();
+        if (objUsuario == null) objUsuario = new Usuario();
         ArrayList dados = new ArrayList();
         
         if (buscar) {
-            dados = new ArrayList();//objDAO.buscar(objUsuario);
+            dados = objDAO.buscar(objUsuario);
+            buscar = false;
         } else {
             dados = objDAO.listarTodos();
         }
@@ -114,6 +117,7 @@ public class TelaInicial extends JFrame {
 		
 		btnCadastrar = new JButton("Cadastrar");
 		btnDeletar = new JButton("Deletar");
+		btn_buscar = new JButton("Buscar");
 		
 		btnCadastrar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -127,7 +131,16 @@ public class TelaInicial extends JFrame {
             }
         });
 		
+		btn_buscar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                tbnBuscarActionPerformed(evt);
+            }
+        });
+		
+		
 		JScrollPane scrollPane = new JScrollPane();
+		
+		
 		GroupLayout gl_contentPane = new GroupLayout(contentPane);
 		gl_contentPane.setHorizontalGroup(
 			gl_contentPane.createParallelGroup(Alignment.LEADING)
@@ -148,9 +161,11 @@ public class TelaInicial extends JFrame {
 								.addComponent(textField_Nome)
 								.addComponent(textField_CPF))
 							.addGap(69)
-							.addComponent(btnCadastrar)
-							.addGap(29)
-							.addComponent(btnDeletar, GroupLayout.PREFERRED_SIZE, 84, GroupLayout.PREFERRED_SIZE))
+							.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING, false)
+								.addComponent(btn_buscar, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+								.addComponent(btnDeletar, GroupLayout.DEFAULT_SIZE, 84, Short.MAX_VALUE)
+								.addComponent(btnCadastrar))
+							.addPreferredGap(ComponentPlacement.RELATED, 178, Short.MAX_VALUE))
 						.addGroup(gl_contentPane.createSequentialGroup()
 							.addContainerGap()
 							.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 541, Short.MAX_VALUE)))
@@ -165,16 +180,21 @@ public class TelaInicial extends JFrame {
 					.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE)
 						.addComponent(Label_ID)
 						.addComponent(textField_ID, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addComponent(btnCadastrar)
-						.addComponent(btnDeletar))
-					.addGap(18)
-					.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE)
-						.addComponent(lblNome)
-						.addComponent(textField_Nome, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addGap(18)
-					.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE)
-						.addComponent(Label_CPF)
-						.addComponent(textField_CPF, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+						.addComponent(btnCadastrar))
+					.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_contentPane.createSequentialGroup()
+							.addGap(18)
+							.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE)
+								.addComponent(lblNome)
+								.addComponent(textField_Nome, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+								.addComponent(btn_buscar))
+							.addGap(18)
+							.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE)
+								.addComponent(Label_CPF)
+								.addComponent(textField_CPF, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
+						.addGroup(gl_contentPane.createSequentialGroup()
+							.addGap(52)
+							.addComponent(btnDeletar)))
 					.addGap(18)
 					.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 117, Short.MAX_VALUE)
 					.addContainerGap())
@@ -255,6 +275,27 @@ public class TelaInicial extends JFrame {
         }
 
         carregarTable(null);
+
+        // apaga os dados preenchidos nos campos de texto
+        setClear();
+    
+	}
+	
+	private void tbnBuscarActionPerformed(java.awt.event.ActionEvent evt) {
+		objUsuario = new Usuario();
+        objUsuario.setNome(textField_Nome.getText()); System.out.println(textField_Nome.getText());
+        objUsuario.setCpf(textField_CPF.getText()); System.out.println(textField_CPF.getText());
+
+        // fazendo a validação dos dados
+        if ((!textField_Nome.getText().isEmpty()) || (!textField_CPF.getText().isEmpty())) {
+            // instanciando a classe UsuarioDAO do pacote dao e criando seu objeto dao
+            objDAO = new UsuarioDAO();
+            buscar = true;
+            carregarTable(objUsuario);
+        }else{
+            buscar = false;
+            carregarTable(null);
+        }
 
         // apaga os dados preenchidos nos campos de texto
         setClear();
