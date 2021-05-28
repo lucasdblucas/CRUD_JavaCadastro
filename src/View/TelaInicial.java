@@ -1,6 +1,5 @@
 package View;
 
-import java.awt.BorderLayout;
 import java.awt.EventQueue;
 
 import javax.swing.JFrame;
@@ -9,17 +8,18 @@ import javax.swing.border.EmptyBorder;
 
 import DAO.UsuarioDAO;
 import Modelo.Usuario;
+import Modelo.Modelo_Tabela;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+
 import java.awt.Font;
 import java.util.ArrayList;
 
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
-import javax.swing.JScrollBar;
-import java.awt.Color;
 import javax.swing.JButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -29,9 +29,11 @@ public class TelaInicial extends JFrame {
 	// Componentes
 	private JPanel contentPane;
 	private JTextField textField_ID;
-	private JTextField textField;
-	private JTextField textField_1;
+	private JTextField textField_Nome;
+	private JTextField textField_CPF;
 	private JTable table_listagem;
+	private JButton btnCadastrar;
+	JButton btnDeletar;
 	
 	// Variaveis de dados
 	private Usuario objUsuario;
@@ -41,7 +43,7 @@ public class TelaInicial extends JFrame {
 	/**
 	 * Launch the application.
 	 */
-	public static void main(String[] args) {
+	public static void main (String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
@@ -58,27 +60,26 @@ public class TelaInicial extends JFrame {
 	public void carregarTable(Usuario objUsuario) {
 
         objDAO = new UsuarioDAO();
+        objUsuario = new Usuario();
         ArrayList dados = new ArrayList();
+        
         if (buscar) {
-            dados = objDAO.buscar(objUsuario);
+            dados = new ArrayList();//objDAO.buscar(objUsuario);
         } else {
-            objUsuario = new Usuario();
             dados = objDAO.listarTodos();
         }
-        String[] colunas = objUsuario.getColunas();
 
-        ModelTable modelo = new ModelTable(dados, colunas);
+        Modelo_Tabela modelo = new Modelo_Tabela(dados, objUsuario.getColunas());
 
-        tbListagemUsuario.setModel(modelo);
-        tbListagemUsuario.getColumnModel().getColumn(0).setPreferredWidth(80);
-        tbListagemUsuario.getColumnModel().getColumn(0).setResizable(false);
-        tbListagemUsuario.getColumnModel().getColumn(1).setPreferredWidth(120);
-        tbListagemUsuario.getColumnModel().getColumn(1).setResizable(false);
-        tbListagemUsuario.getColumnModel().getColumn(2).setPreferredWidth(250);
-        tbListagemUsuario.getColumnModel().getColumn(2).setResizable(false);
-        tbListagemUsuario.getTableHeader().setReorderingAllowed(false);
-        //  tbListagemUsuario.setAutoResizeMode(tbListagemUsuario.AUTO_RESIZE_ALL_COLUMNS);
-        // tbListagemUsuario.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        table_listagem.setModel(modelo);
+        table_listagem.getColumnModel().getColumn(0).setPreferredWidth(80);
+        table_listagem.getColumnModel().getColumn(0).setResizable(false);
+        table_listagem.getColumnModel().getColumn(1).setPreferredWidth(120);
+        table_listagem.getColumnModel().getColumn(1).setResizable(false);
+        table_listagem.getColumnModel().getColumn(2).setPreferredWidth(250);
+        table_listagem.getColumnModel().getColumn(2).setResizable(false);
+        
+        table_listagem.getTableHeader().setReorderingAllowed(false);
     }
 	
 	/**
@@ -97,6 +98,7 @@ public class TelaInicial extends JFrame {
 		JLabel Label_ID = new JLabel("ID: ");
 		
 		textField_ID = new JTextField();
+		textField_ID.setEditable(false);
 		textField_ID.setColumns(10);
 		
 		JLabel lblNome = new JLabel("Nome: ");
@@ -104,15 +106,26 @@ public class TelaInicial extends JFrame {
 		
 		JLabel Label_CPF = new JLabel("CPF: ");
 		
-		textField = new JTextField();
-		textField.setColumns(10);
+		textField_Nome = new JTextField();
+		textField_Nome.setColumns(10);
 		
-		textField_1 = new JTextField();
-		textField_1.setColumns(10);
+		textField_CPF = new JTextField();
+		textField_CPF.setColumns(10);
 		
-		JButton btnCadastrar = new JButton("Cadastrar");
+		btnCadastrar = new JButton("Cadastrar");
+		btnDeletar = new JButton("Deletar");
 		
-		JButton btnDeletar = new JButton("Deletar");
+		btnCadastrar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                tbnSalvarActionPerformed(evt);
+            }
+        });
+		
+		btnDeletar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                tbnDeletarActionPerformed(evt);
+            }
+        });
 		
 		JScrollPane scrollPane = new JScrollPane();
 		GroupLayout gl_contentPane = new GroupLayout(contentPane);
@@ -132,8 +145,8 @@ public class TelaInicial extends JFrame {
 							.addGap(43)
 							.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING, false)
 								.addComponent(textField_ID, GroupLayout.DEFAULT_SIZE, 132, Short.MAX_VALUE)
-								.addComponent(textField)
-								.addComponent(textField_1))
+								.addComponent(textField_Nome)
+								.addComponent(textField_CPF))
 							.addGap(69)
 							.addComponent(btnCadastrar)
 							.addGap(29)
@@ -157,18 +170,107 @@ public class TelaInicial extends JFrame {
 					.addGap(18)
 					.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE)
 						.addComponent(lblNome)
-						.addComponent(textField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+						.addComponent(textField_Nome, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 					.addGap(18)
 					.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE)
 						.addComponent(Label_CPF)
-						.addComponent(textField_1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+						.addComponent(textField_CPF, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 					.addGap(18)
 					.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 117, Short.MAX_VALUE)
 					.addContainerGap())
 		);
 		
 		table_listagem = new JTable();
-		scrollPane.setColumnHeaderView(table_listagem);
+		table_listagem.setModel(new javax.swing.table.DefaultTableModel(
+	        new Object [][] {
+	            {null, null, null},
+	            {null, null, null},
+	            {null, null, null},
+	            {null, null, null}
+	        },
+	        new String [] {"ID", "Nome", "CPF"}
+	    ){
+	        Class[] types = new Class [] {
+	            java.lang.String.class, java.lang.String.class, java.lang.String.class
+	        };
+	        boolean[] canEdit = new boolean [] {
+	            false, true, true
+	        };
+	
+	        public Class getColumnClass(int columnIndex) {
+	            return types [columnIndex];
+	        }
+	
+	        public boolean isCellEditable(int rowIndex, int columnIndex) {
+	            return canEdit [columnIndex];
+	        }
+	    });
+	    table_listagem.addMouseListener(new java.awt.event.MouseAdapter() {
+	        public void mouseClicked(java.awt.event.MouseEvent evt) {
+	            table_listagem_mouseclick(evt);
+	        }
+	    });
+		
+		scrollPane.setViewportView(table_listagem);
 		contentPane.setLayout(gl_contentPane);
+		
+		carregarTable(null);
+	}
+	
+	private void tbnSalvarActionPerformed(java.awt.event.ActionEvent evt) {
+
+        objUsuario = new Usuario();
+        objUsuario.setId(textField_ID.getText());
+        objUsuario.setNome(textField_Nome.getText());
+        objUsuario.setCpf(textField_CPF.getText());
+
+        // fazendo a validação dos dados
+        if ((textField_Nome.getText().isEmpty()) || (textField_CPF.getText().isEmpty()) ){
+            JOptionPane.showMessageDialog(null, "Valores Nome e CPF precisam ser informados");
+        } else {
+            // instanciando a classe UsuarioDAO do pacote dao e criando seu objeto dao
+            objDAO = new UsuarioDAO();
+            objDAO.salvar(objUsuario);
+            JOptionPane.showMessageDialog(null, "Usuário " + textField_Nome.getText() + " inserido com sucesso! ");
+        }
+
+        carregarTable(null);
+
+        // apaga os dados preenchidos nos campos de texto
+        setClear();
+    }
+	
+	private void tbnDeletarActionPerformed(java.awt.event.ActionEvent evt) {
+		objUsuario = new Usuario();
+        objUsuario.setId(textField_ID.getText());
+
+        // fazendo a validação dos dados
+        if ((textField_ID.getText().isEmpty())) {
+            JOptionPane.showMessageDialog(null, "Informe valores para os campos");
+        } else {
+            // instanciando a classe UsuarioDAO do pacote dao e criando seu objeto dao
+            objDAO = new UsuarioDAO();
+            objDAO.deletar(objUsuario);
+            JOptionPane.showMessageDialog(null, "Usuário Removido com Sucesso! ");
+        }
+
+        carregarTable(null);
+
+        // apaga os dados preenchidos nos campos de texto
+        setClear();
+    
+	}
+	
+	private void setClear() {
+		textField_ID.setText(null);
+		textField_Nome.setText(null);
+		textField_CPF.setText(null);
+	}
+	
+	private void table_listagem_mouseclick (java.awt.event.MouseEvent evt) {
+		textField_ID.setText(table_listagem.getValueAt(table_listagem.getSelectedRow(), 0).toString());
+        textField_Nome.setText(table_listagem.getValueAt(table_listagem.getSelectedRow(), 1).toString());
+        textField_CPF.setText(table_listagem.getValueAt(table_listagem.getSelectedRow(), 2).toString());
+        
 	}
 }

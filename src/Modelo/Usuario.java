@@ -4,7 +4,16 @@ public class Usuario {
 	private String id;
 	private String nome;
 	private String cpf;
+	private String[] colunas = new String[]{"ID", "NOME", "CPF"};
 	
+	public String[] getColunas() {
+		return colunas;
+	}
+
+	public void setColunas(String[] colunas) {
+		this.colunas = colunas;
+	}
+
 	public Usuario(){
 		
 	}

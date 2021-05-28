@@ -1,4 +1,3 @@
-create database db_usuario;
 use db_usuario;
 CREATE TABLE usuario (
 id BIGINT(10) AUTO_INCREMENT,

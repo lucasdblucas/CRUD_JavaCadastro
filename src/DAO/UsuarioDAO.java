@@ -36,8 +36,6 @@ public class UsuarioDAO {
                     rs.getInt("id"),
                     rs.getString("nome"),
                     rs.getString("cpf"),
-                    rs.getString("email"),
-                    rs.getString("telefone")
                 });
 
             }
@@ -48,14 +46,57 @@ public class UsuarioDAO {
             return dado;
         } catch (SQLException e) {
             e.getMessage();
-            JOptionPane.showMessageDialog(null, "Erro preencher o ArrayList");
+            JOptionPane.showMessageDialog(null, "Erro ao recuperar lista de usuários");
             return null;
         }
     }
+	
+	 public void salvar(Usuario objUsuario) {
+        try {
+            String sql;
+            if (String.valueOf(objUsuario.getId()).isEmpty()) {
+                sql = "INSERT INTO usuario(nome,cpf) VALUES(?,?)";
+                PreparedStatement stmt = connection.prepareStatement(sql);
 
+                stmt.setString(1, objUsuario.getNome());
+                stmt.setString(2, objUsuario.getCpf());
+                
+                stmt.execute();
+                stmt.close();
+
+            } else {
+                sql = "UPDATE usuario SET nome = ?, cpf = ?, email = ?, telefone = ? WHERE usuario.id = ?";
+
+                PreparedStatement stmt = connection.prepareStatement(sql);
+
+                stmt.setString(5, objUsuario.getId());
+                stmt.setString(1, objUsuario.getNome());
+                stmt.setString(2, objUsuario.getCpf());
+                
+                stmt.execute();
+                stmt.close();
+
+            }
+        } catch (SQLException u) {
+            throw new RuntimeException(u);
+        }
     }
 
-	
+	public void deletar(Usuario objUsuario) {
+        try {
+            String sql;
+            if (!String.valueOf(objUsuario.getId()).isEmpty()) {
+                sql = "DELETE FROM usuario WHERE usuario.id = ?";
+                PreparedStatement stmt = connection.prepareStatement(sql);
+
+                stmt.setString(1, objUsuario.getId());
+                stmt.execute();
+                stmt.close();
+            }
+        } catch (SQLException u) {
+            throw new RuntimeException(u);
+        }
+    }
 //	public ArrayList buscar(Usuario objUsuario) {
 //        try {
 //            String sql = "";
